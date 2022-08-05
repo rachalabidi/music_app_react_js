@@ -1,7 +1,8 @@
 import React  from "react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { faPlay ,faAngleLeft ,faAngleRight , faPause } from "@fortawesome/free-solid-svg-icons"
-const Player =({ currentSong , isPlaying , setIsPlaying , audioRef , songInfo, setSongInfo} )=>{
+
+const Player =({ currentSong , isPlaying , setIsPlaying , audioRef , songInfo, setSongInfo , songs, setCurrentSong} )=>{
 
     // const audioRef= useRef(null);
     //add events handlers 
@@ -28,6 +29,22 @@ const dragHandler =(e)=>{
     audioRef.current.currentTime = e.target.value;
     setSongInfo({...songInfo , currentTime:e.target.value})
 }
+const skip =(direction)=>{
+ let currentIndex = songs.findIndex((song)=> song.id === currentSong.id)
+  if( direction === "forward"){
+    setCurrentSong(songs[(currentIndex+1)%songs.length])
+    console.log("am working forward")
+  }
+  if(direction === "back"){
+    if((currentIndex-1) % songs.length === -1){
+        setCurrentSong(songs[(songs.length-1)])
+         return;
+    }
+    setCurrentSong(songs[(currentIndex-1)%songs.length])
+    console.log("am working back")
+
+  }
+}
     //states
     // const [songInfo , setSongInfo]= useState(
     //     {
@@ -50,9 +67,9 @@ const dragHandler =(e)=>{
                 </p>
             </div>
             <div className="play-control">
-                <FontAwesomeIcon className="skip-back" size="2x" icon={faAngleLeft} />
+                <FontAwesomeIcon onClick={()=> skip("back")} className="skip-back" size="2x" icon={faAngleLeft} />
                 <FontAwesomeIcon onClick={playSongHandler} className="play" size="2x" icon={isPlaying ? faPause : faPlay} />
-                <FontAwesomeIcon className="skip-forwad"  size="2x" icon={faAngleRight} />
+                <FontAwesomeIcon onClick={()=> skip("forward")} className="skip-forwad"  size="2x" icon={faAngleRight} />
             </div>
             {/* <audio onTimeUpdate={timeUpdateHandler}
             onLoadedMetadata={timeUpdateHandler}
