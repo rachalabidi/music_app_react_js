@@ -26,9 +26,14 @@ function App() {
     const current= e.target.currentTime;
     const duration= e.target.duration;
     setSongInfo({...songInfo, currentTime: current , duration})  }
+    const songEndhandler = async()=>{
+      let currentIndex = songs.findIndex((song)=> song.id === currentSong.id)
+   await setCurrentSong(songs[(currentIndex+1)%songs.length])
+   if(isPlaying) audioRef.current.play();
+    }
 
   return (
-    <div className="App">
+    <div className={`app ${libraryStatus ? "active-app" : ""}`}>
           <Nav libraryStatus={libraryStatus} setLibraryStatus={setLibraryStatus} />
           <Song
            currentSong={currentSong}
@@ -42,6 +47,8 @@ function App() {
            setIsPlaying={setIsPlaying}
            songs={songs}
            setCurrentSong={setCurrentSong}
+           setSongs={setSongs}
+
            />
            <Library 
            audioRef= {audioRef}
@@ -54,7 +61,9 @@ function App() {
              <audio onTimeUpdate={timeUpdateHandler}
             onLoadedMetadata={timeUpdateHandler}
              ref={audioRef} 
-             src={currentSong.audio}></audio>      
+             src={currentSong.audio}>
+              onEnded={songEndhandler}
+            </audio>      
    </div>
   
   );

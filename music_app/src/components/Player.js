@@ -1,10 +1,28 @@
 import React  from "react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { faPlay ,faAngleLeft ,faAngleRight , faPause } from "@fortawesome/free-solid-svg-icons"
+import { useEffect } from 'react';
 
-const Player =({ currentSong , isPlaying , setIsPlaying , audioRef , songInfo, setSongInfo , songs, setCurrentSong} )=>{
+const Player =({ currentSong , isPlaying , setIsPlaying , audioRef , songInfo, setSongInfo , songs, setCurrentSong,setSongs})=>{
 
     // const audioRef= useRef(null);
+    useEffect(()=>{
+        const newSongs=  songs.map((song)=>{
+            if(song.id === currentSong.id){
+                return{
+                    ...song,
+                    active: true,
+                }
+            }else{
+                return{
+                ...song,
+                active: false,
+                }
+            } 
+           })
+           setSongs(newSongs)
+
+    })
     //add events handlers 
     const playSongHandler=()=>{
         if(isPlaying){
@@ -33,17 +51,32 @@ const skip =(direction)=>{
  let currentIndex = songs.findIndex((song)=> song.id === currentSong.id)
   if( direction === "forward"){
     setCurrentSong(songs[(currentIndex+1)%songs.length])
-    console.log("am working forward")
   }
   if(direction === "back"){
     if((currentIndex-1) % songs.length === -1){
         setCurrentSong(songs[(songs.length-1)])
+        if(isPlaying){
+            const playPromise= audioRef.current.play(); 
+            if(playPromise !== undefined){
+             playPromise.then((audio)=>{
+                 audioRef.current.play();
+             })
+            }
+         }
          return;
     }
     setCurrentSong(songs[(currentIndex-1)%songs.length])
     console.log("am working back")
 
   }
+  if(isPlaying){
+    const playPromise= audioRef.current.play(); 
+    if(playPromise !== undefined){
+     playPromise.then((audio)=>{
+         audioRef.current.play();
+     })
+    }
+ }
 }
     //states
     // const [songInfo , setSongInfo]= useState(
@@ -63,7 +96,7 @@ const skip =(direction)=>{
                 type="range">
                      
                 </input>
-                <p> {getTime(songInfo.duration) }
+                <p> { songInfo.duration ? getTime(songInfo.duration) : "0:00" }
                 </p>
             </div>
             <div className="play-control">
