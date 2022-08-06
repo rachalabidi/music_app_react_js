@@ -1,14 +1,14 @@
 import React  from "react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { faPlay ,faAngleLeft ,faAngleRight , faPause } from "@fortawesome/free-solid-svg-icons"
-import { useEffect } from 'react';
+
 
 const Player =({ currentSong , isPlaying , setIsPlaying , audioRef , songInfo, setSongInfo , songs, setCurrentSong,setSongs})=>{
 
     // const audioRef= useRef(null);
-    useEffect(()=>{
+    const activeLibraryHandler =( nextprev)=>{
         const newSongs=  songs.map((song)=>{
-            if(song.id === currentSong.id){
+            if(song.id === nextprev.id){
                 return{
                     ...song,
                     active: true,
@@ -21,8 +21,7 @@ const Player =({ currentSong , isPlaying , setIsPlaying , audioRef , songInfo, s
             } 
            })
            setSongs(newSongs)
-
-    })
+    }
     //add events handlers 
     const playSongHandler=()=>{
         if(isPlaying){
@@ -51,10 +50,13 @@ const skip =(direction)=>{
  let currentIndex = songs.findIndex((song)=> song.id === currentSong.id)
   if( direction === "forward"){
     setCurrentSong(songs[(currentIndex+1)%songs.length])
+    activeLibraryHandler(songs[(currentIndex+1)%songs.length])
   }
   if(direction === "back"){
     if((currentIndex-1) % songs.length === -1){
         setCurrentSong(songs[(songs.length-1)])
+        activeLibraryHandler(songs[(currentIndex-1)%songs.length])
+
         if(isPlaying){
             const playPromise= audioRef.current.play(); 
             if(playPromise !== undefined){
@@ -66,7 +68,6 @@ const skip =(direction)=>{
          return;
     }
     setCurrentSong(songs[(currentIndex-1)%songs.length])
-    console.log("am working back")
 
   }
   if(isPlaying){
@@ -107,8 +108,8 @@ const skip =(direction)=>{
             {/* <audio onTimeUpdate={timeUpdateHandler}
             onLoadedMetadata={timeUpdateHandler}
              ref={audioRef} 
-             src={currentSong.audio}></audio> */}
-            <h6>MADE BY : Rasha Labidi :) </h6>
+             src={currentSong.audio}></audio>             <h6>MADE BY : Rasha Labidi :) </h6>
+*/}
         </div>
     )
 }
